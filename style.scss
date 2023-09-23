@@ -1,8 +1,19 @@
+$breakpoints: (
+  sp: "screen and (max-width: 767px)",
+  tab: "screen and (min-width: 768px)",
+  pc: "screen and (min-width: 1025px)",
+) !default;
+
+@mixin mq($breakpoint: sp) {
+  @media #{map-get($breakpoints, $breakpoint)} {
+    @content;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   font-family: "Roboto", sans-serif;
 }
 
@@ -11,19 +22,10 @@ main {
   font-size: 16px;
   width: 100vw;
   height: calc(100vh - 50px);
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-}
-
-@media screen and (min-width: 768px) {
-  main {
+  justify-content: center;
+  align-items: center;
+  @include mq(tab) {
     height: calc(100vh - 63px);
   }
 }
@@ -33,10 +35,8 @@ h1 {
   text-transform: uppercase;
   padding: 10px;
   font-size: 22px;
-}
 
-@media screen and (min-width: 768px) {
-  h1 {
+  @include mq(tab) {
     font-size: 32px;
   }
 }
@@ -45,14 +45,16 @@ h1 {
   position: relative;
   width: 100%;
   height: 100%;
+  //   background-color: #202;
   background-color: #451952;
   overflow: hidden;
-  cursor: -webkit-grab;
   cursor: grab;
-}
-
-@media screen and (min-width: 768px) {
-  #board {
+  //   background-image: url(./image2.jpg);
+  //   background-repeat: no-repeat;
+  //   background-size: cover;
+  //   background-position: center center;
+  //   filter: brightness(150%);
+  @include mq(tab) {
     max-width: 900px;
     max-height: 80%;
     margin: 0 auto 0 auto;
@@ -60,7 +62,6 @@ h1 {
 }
 
 #board:active {
-  cursor: -webkit-grabbing;
   cursor: grabbing;
 }
 
@@ -69,8 +70,7 @@ h1 {
   width: 90%;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   color: black;
   text-align: center;
   background: #fdf8e6;
@@ -78,50 +78,42 @@ h1 {
   display: none;
   z-index: 9999;
   font-size: 1.5rem;
-}
-
-@media screen and (min-width: 768px) {
-  #result {
+  @include mq(tab) {
     width: 70%;
+  }
+
+  .happy-halloween {
+    margin-top: 10px;
   }
 }
 
-#result .happy-halloween {
-  margin-top: 10px;
-}
-
 #level {
-  -webkit-filter: none;
-          filter: none;
+  filter: none;
   position: absolute;
   width: 90%;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   color: black;
   text-align: center;
   background: #fdf8e6;
   padding: 20px;
   z-index: 9999;
   font-size: 1.5rem;
-}
-
-@media screen and (min-width: 768px) {
-  #level {
+  @include mq(tab) {
     width: 70%;
   }
-}
 
-#level select {
-  width: 50%;
-  margin: 0 auto;
-  display: block;
-  margin-top: 20px;
-  padding: 10px;
-  font-size: 1rem;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  select {
+    width: 50%;
+    margin: 0 auto;
+    display: block;
+    margin-top: 20px;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
 }
 
 #playAgain,
@@ -141,29 +133,24 @@ h1 {
 
 #countDown {
   position: absolute;
+  //   display: flex;
   display: none;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: center;
+  align-items: center;
   border-radius: 50%;
+  //   width: 200px;
+  //   height: 200px;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   color: white;
   text-align: center;
+  //   background: #fdf8e6;
   padding: 20px;
   z-index: 9999;
   font-size: 100px;
   font-weight: bold;
-}
-
-@media screen and (min-width: 768px) {
-  #countDown {
+  @include mq(tab) {
     font-size: 200px;
   }
 }
-/*# sourceMappingURL=style.css.map */

@@ -11,17 +11,32 @@
     <script src="main.js"></script>
   </head>
   <body>
-    <h1>🎃 halloween game 🎃</h1>
-    <div id="board">
-      <div id="result">
-        <p>You've got</p>
-        <p><span id="candy"></span> 🍬s</p>
-        <p><span id="lollipop"></span> 🍭s</p>
-        <p>Wandered for <span id="elapsedTime"></span> secs!</p>
-        <p class="happy-halloween">👻 Happy Halloween! 👻</p>
-        <button id="playAgain">Let's Play Again</button>
+    <header><h1>🎃 trick or treat game 🎃</h1></header>
+    <main>
+      <div id="board">
+        <div id="result">
+          <p>You've got</p>
+          <p><span id="candy"></span> 🍬s</p>
+          <p><span id="lollipop"></span> 🍭s</p>
+          <p>Wandered for <span id="elapsedTime"></span> secs!</p>
+          <p class="happy-halloween">👻 Happy Halloween! 👻</p>
+          <button id="playAgain">Let's Play Again</button>
+        </div>
+
+        <div id="level">
+          <p>Choose your level</p>
+          <form id="levelForm">
+            <select id="levelSelect">
+              <option value="easy">Easy</option>
+              <option value="normal">Normal</option>
+              <option value="hard">Hard</option>
+            </select>
+            <input id="start" type="submit" value="Start" />
+          </form>
+        </div>
+
+        <div id="countDown"><span id="countDownNum">1</span></div>
       </div>
-    </div>
+    </main>
   </body>
 </html>
-
