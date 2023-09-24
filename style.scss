@@ -15,10 +15,10 @@ $breakpoints: (
   padding: 0;
   box-sizing: border-box;
   font-family: "Roboto", sans-serif;
+  overflow: hidden;
 }
 
 main {
-  overflow-x: hidden;
   font-size: 16px;
   width: 100vw;
   height: calc(100vh - 50px);
@@ -35,7 +35,6 @@ h1 {
   text-transform: uppercase;
   padding: 10px;
   font-size: 22px;
-
   @include mq(tab) {
     font-size: 32px;
   }
@@ -45,10 +44,8 @@ h1 {
   position: relative;
   width: 100%;
   height: 100%;
-  //   background-color: #202;
   background-color: #451952;
-  overflow: hidden;
-  cursor: grab;
+  //   background-color: #202;
   //   background-image: url(./image2.jpg);
   //   background-repeat: no-repeat;
   //   background-size: cover;
@@ -59,10 +56,6 @@ h1 {
     max-height: 80%;
     margin: 0 auto 0 auto;
   }
-}
-
-#board:active {
-  cursor: grabbing;
 }
 
 #result {
@@ -76,7 +69,7 @@ h1 {
   background: #fdf8e6;
   padding: 20px;
   display: none;
-  z-index: 9999;
+  z-index: 999;
   font-size: 1.5rem;
   @include mq(tab) {
     width: 70%;
@@ -98,21 +91,47 @@ h1 {
   text-align: center;
   background: #fdf8e6;
   padding: 20px;
-  z-index: 9999;
+  z-index: 999;
   font-size: 1.5rem;
   @include mq(tab) {
     width: 70%;
   }
 
-  select {
+  .selectWrapper {
+    position: relative;
     width: 50%;
     margin: 0 auto;
-    display: block;
     margin-top: 20px;
+
+    &::after {
+      content: "";
+      position: absolute;
+      display: inline-block;
+      top: calc(50% - 5px);
+      right: 25px;
+      width: 8px;
+      height: 8px;
+      border-bottom: 2px solid #ccc;
+      border-right: 2px solid #ccc;
+      transform: rotate(45deg) translateY(-50%);
+      pointer-events: none;
+    }
+  }
+
+  select {
+    width: 100%;
+    margin: 0 auto;
+    display: block;
+    cursor: pointer;
     padding: 10px;
     font-size: 1rem;
     border-radius: 5px;
     border: 1px solid #ccc;
+    appearance: none;
+
+    &:focus {
+      outline-color: orange;
+    }
   }
 }
 
@@ -133,21 +152,17 @@ h1 {
 
 #countDown {
   position: absolute;
-  //   display: flex;
   display: none;
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  //   width: 200px;
-  //   height: 200px;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
   text-align: center;
-  //   background: #fdf8e6;
   padding: 20px;
-  z-index: 9999;
+  z-index: 999;
   font-size: 100px;
   font-weight: bold;
   @include mq(tab) {

@@ -7,7 +7,6 @@ let score = {
   candy: 0,
   lollipop: 0,
 };
-let scoreElement = null;
 let ghostList = [];
 let candyList = [];
 let lollipopList = [];
@@ -31,7 +30,7 @@ const ghostSpeed = () => {
   } else if (level === "normal") {
     return 1.6;
   } else if (level === "hard") {
-    return 3.2;
+    return 2.5;
   }
 };
 
@@ -43,41 +42,6 @@ const ghostInterval = () => {
   } else if (level === "hard") {
     return 10;
   }
-};
-
-const getCache = () => {
-  board = document.getElementById("board");
-  boardWidth = board.clientWidth;
-  boardHeight = board.clientHeight;
-
-  // heroの初期位置
-  heroX = boardWidth / 2;
-  heroY = boardHeight / 2;
-
-  playAgainBtn = document.getElementById("playAgain");
-  elapsedTimeEl = document.getElementById("elapsedTime");
-  candyScoreEl = document.getElementById("candy");
-  lollipopScoreEl = document.getElementById("lollipop");
-};
-
-const createHero = () => {
-  heroElement = document.createElement("div");
-  heroElement.style.position = "absolute";
-  heroElement.style.display = "flex";
-  heroElement.style.alignItems = "center";
-  heroElement.style.justifyContent = "center";
-  heroElement.style.width = `${charSize}px`;
-  heroElement.style.height = `${charSize}px`;
-  heroElement.style.fontSize = `${charSize}px`;
-  heroElement.style.zIndex = zIndex.hero;
-  heroElement.textContent = "🧒🏻";
-  board.appendChild(heroElement);
-};
-
-const heroUpdate = () => {
-  // Heroを動かす
-  heroElement.style.left = `${heroX - charSize / 2}px`;
-  heroElement.style.top = `${heroY - charSize / 2}px`;
 };
 
 class Character {
@@ -107,22 +71,6 @@ class Character {
     this.available = false;
     this.element.remove();
   }
-
-  isAvailable() {
-    if (!this.available) {
-      return false;
-    }
-    if (
-      this.x < -this.size ||
-      this.x > boardWidth + this.size ||
-      this.y < -this.size ||
-      this.y > boardHeight + this.size
-    ) {
-      this.remove();
-      return false;
-    }
-    return true;
-  }
 }
 
 class Ghost extends Character {
@@ -149,6 +97,22 @@ class Ghost extends Character {
 
   update() {
     super.update();
+    if (!this.isInBoard()) {
+      this.remove();
+    }
+  }
+
+  isInBoard() {
+    if (
+      !this.available ||
+      this.x < 0 - charSize / 2 ||
+      this.x > boardWidth + charSize / 2 ||
+      this.y < 0 - charSize / 2 ||
+      this.y > boardHeight + charSize / 2
+    ) {
+      return false;
+    }
+    return true;
   }
 }
 
@@ -173,10 +137,10 @@ class Candy extends Character {
   }
 
   catchCandy() {
-    console.log("catchCandy");
     score.candy++;
     this.remove();
     this.available = false;
+    handleHeroFace("happy");
   }
 }
 
@@ -198,6 +162,7 @@ class Lollipop extends Candy {
     score.lollipop++;
     this.remove();
     this.available = false;
+    handleHeroFace("happy");
   }
 }
 
@@ -222,7 +187,7 @@ class Pumpkin extends Character {
   }
 
   clearGhosts() {
-    console.log("clearGhosts");
+    handleHeroFace("clearGhost");
     for (const ghost of ghostList) {
       ghost.remove();
     }
@@ -232,8 +197,60 @@ class Pumpkin extends Character {
   }
 }
 
+const getCache = () => {
+  board = document.getElementById("board");
+  boardWidth = board.clientWidth;
+  boardHeight = board.clientHeight;
+  boardMarginLeft = board.getBoundingClientRect().left;
+  // heroの初期位置;
+  heroX = boardWidth / 2;
+  heroY = boardHeight / 2;
+  playAgainBtn = document.getElementById("playAgain");
+  elapsedTimeEl = document.getElementById("elapsedTime");
+  candyScoreEl = document.getElementById("candy");
+  lollipopScoreEl = document.getElementById("lollipop");
+};
+
+const createHero = () => {
+  heroElement = document.createElement("div");
+  heroElement.style.position = "absolute";
+  heroElement.style.display = "flex";
+  heroElement.style.alignItems = "center";
+  heroElement.style.justifyContent = "center";
+  heroElement.style.width = `${charSize}px`;
+  heroElement.style.height = `${charSize}px`;
+  heroElement.style.fontSize = `${charSize}px`;
+  heroElement.style.zIndex = zIndex.hero;
+  heroElement.textContent = "🧒🏻";
+  board.appendChild(heroElement);
+};
+
+const heroUpdate = () => {
+  // Heroを動かす
+  heroElement.style.left = `${heroX - charSize / 2}px`;
+  heroElement.style.top = `${heroY - charSize / 2}px`;
+};
+
+const handleHeroFace = (faceType) => {
+  if (faceType === "happy") {
+    heroElement.textContent = "😋";
+  } else if (faceType === "clearGhost") {
+    heroElement.textContent = "😎";
+  } else if (faceType === "gameover") {
+    heroElement.textContent = "😝";
+    return;
+  }
+  setTimeout(() => {
+    heroElement.textContent = "🧒🏻";
+  }, 300);
+};
+
 const addEventListeners = () => {
   board.addEventListener("pointerdown", (e) => {
+    if (gameover) {
+      return;
+    }
+    console.log("pointerdown");
     e.preventDefault();
     // originalXYには、クリックした座標が入る
     clickedX = e.pageX;
@@ -241,15 +258,23 @@ const addEventListeners = () => {
     // originHeroXYには、heroの位置が入る
     originHeroX = heroX;
     originHeroY = heroY;
+    board.style.cursor = "grabbing";
   });
 
   board.addEventListener("pointermove", function (e) {
+    if (gameover) {
+      return;
+    }
+    console.log("pointermove");
     e.preventDefault();
     if (gameover) {
       return;
     }
     // X座標が-1でない場合、つまりクリックした場合
     if (clickedX && clickedY) {
+      if (gameover) {
+        return;
+      }
       // クリックした座標と、クリックしたまま動かした座標の差分を取得
       const diffX = e.pageX - clickedX;
       const diffY = e.pageY - clickedY;
@@ -270,11 +295,15 @@ const addEventListeners = () => {
     }
   });
 
-  board.addEventListener("pointerup", function (e) {
+  board.addEventListener("pointerup", (e) => {
+    if (gameover) {
+      return;
+    }
+    console.log("pointerup");
+    board.style.cursor = "grab";
     e.preventDefault();
     clickedX = null;
   });
-
   playAgainBtn.addEventListener("click", handlePlayAgain);
 };
 
@@ -373,15 +402,10 @@ const showGhosts = async () => {
     interval--;
 
     for (let ghost of ghostList) {
-      console.log(ghostList);
       ghost.update();
     }
 
-    // availableがtrueのものだけを残す
-    ghostList = ghostList.filter((ghost) => ghost.isAvailable());
-    // filteredghostList = ghostList.filter((ghost) => ghost.available);
-    // console.log(ghostList);
-    // console.log(filteredghostList);
+    ghostList = ghostList.filter((ghost) => ghost.isInBoard());
 
     // ？？？
     for (const ghost of ghostList) {
@@ -401,7 +425,8 @@ const showGhosts = async () => {
 
 const handleGameOver = () => {
   gameover = true;
-  heroElement.textContent = "😝";
+  handleHeroFace("gameover");
+  board.style.cursor = "default";
   const endTime = performance.now();
   elapsedTime = Math.round(((endTime - startTime) / 1000) * 100) / 100;
   elapsedTimeEl.textContent = elapsedTime;
@@ -426,7 +451,7 @@ const triggerCongetti = () => {
   });
 };
 
-const handleGameStart = (e) => {
+const handleLevelSubmit = (e) => {
   e.preventDefault();
   const levelValue = e.target.levelSelect.value;
   level = levelValue;
@@ -442,8 +467,6 @@ const handleGameStart = (e) => {
       }
     }, (3 - i) * 1000);
   }
-  // countDown.style.display = "none";
-  // gameInit();
 };
 
 const gameInit = () => {
@@ -456,7 +479,7 @@ const gameInit = () => {
   showItems("pumpkin");
   showGhosts();
   showPumpkin();
-
+  board.style.cursor = "grab";
   startTime = performance.now();
 };
 
@@ -464,7 +487,7 @@ window.addEventListener("load", async () => {
   // init();
   levelDiv = document.getElementById("level");
   levelForm = document.getElementById("levelForm");
-  levelForm.addEventListener("submit", handleGameStart);
+  levelForm.addEventListener("submit", handleLevelSubmit);
   countDown = document.getElementById("countDown");
   countDowmNum = document.getElementById("countDownNum");
 });
