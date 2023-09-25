@@ -15,6 +15,7 @@ const zIndex = {
   ghost: 10,
   item: 1,
 };
+
 // const ghostSpeed = width / 200;
 const ghostSpeed = () => {
   if (level === "easy") {
@@ -23,7 +24,7 @@ const ghostSpeed = () => {
     return 1.6;
   } else if (level === "hard") {
     return 2.5;
-  }
+  } else return;
 };
 const ghostInterval = () => {
   if (level === "easy") {
@@ -32,7 +33,7 @@ const ghostInterval = () => {
     return 20;
   } else if (level === "hard") {
     return 10;
-  }
+  } else return;
 };
 
 class Character {
