@@ -1,7 +1,4 @@
-let clickedX = null;
-let clickedY = null;
-let originHeroX = null;
-let originHeroY = null;
+let clickedX, clickedY, originHeroX, originHeroY, level, pumpkin;
 let gameover = false;
 let score = {
   candy: 0,
@@ -10,19 +7,14 @@ let score = {
 let ghostList = [];
 let candyList = [];
 let lollipopList = [];
-let pumpkin = null;
-let level = null;
-
 const charSize = 40;
 const candyInterval = 100;
 const lollipopInterval = 200;
-
 const zIndex = {
   hero: 100,
   ghost: 10,
   item: 1,
 };
-
 // const ghostSpeed = width / 200;
 const ghostSpeed = () => {
   if (level === "easy") {
@@ -33,7 +25,6 @@ const ghostSpeed = () => {
     return 2.5;
   }
 };
-
 const ghostInterval = () => {
   if (level === "easy") {
     return 60;
@@ -45,26 +36,29 @@ const ghostInterval = () => {
 };
 
 class Character {
-  constructor(x, y, size, angle, speed) {
+  constructor(x, y, angle, speed) {
     this.x = x;
     this.y = y;
-    this.size = size;
     this.angle = angle;
     this.speed = speed;
     this.available = true;
     const element = document.createElement("div");
     board.appendChild(element);
     element.style.position = "absolute";
-    element.style.width = `${size}px`;
-    element.style.height = `${size}px`;
+    element.style.width = `${charSize}px`;
+    element.style.height = `${charSize}px`;
     this.element = element;
+    this.element.style.display = "flex";
+    this.element.style.alignItems = "center";
+    this.element.style.justifyContent = "center";
+    this.element.style.fontSize = `${charSize}px`;
   }
 
   update() {
     this.x += Math.cos(this.angle) * this.speed;
     this.y += Math.sin(this.angle) * this.speed;
-    this.element.style.left = `${this.x - this.size / 2}px`;
-    this.element.style.top = `${this.y - this.size / 2}px`;
+    this.element.style.left = `${this.x - charSize / 2}px`;
+    this.element.style.top = `${this.y - charSize / 2}px`;
   }
 
   remove() {
@@ -75,24 +69,11 @@ class Character {
 
 class Ghost extends Character {
   constructor(x, y, angle, speed) {
-    super(x, y, charSize, angle, speed);
-
-    this.element.style.display = "flex";
-    this.element.style.alignItems = "center";
-    this.element.style.justifyContent = "center";
+    super(x, y, angle, speed);
     this.element.style.zIndex = zIndex.ghost;
     this.element.style.transition =
       "opacity 300ms ease-in-out, filter 300ms ease-in-out";
-    this.element.style.fontSize = `${charSize}px`;
     this.element.textContent = "👻";
-  }
-
-  async remove() {
-    this.element.style.opacity = 0;
-    this.element.style.filter = "brightness(100)";
-    await new Promise((r) => setTimeout(r, 300));
-    this.available = false;
-    super.remove();
   }
 
   update() {
@@ -100,6 +81,13 @@ class Ghost extends Character {
     if (!this.isInBoard()) {
       this.remove();
     }
+  }
+
+  async remove() {
+    this.element.style.opacity = 0;
+    this.element.style.filter = "brightness(100)";
+    await new Promise((r) => setTimeout(r, 300));
+    super.remove();
   }
 
   isInBoard() {
@@ -116,70 +104,47 @@ class Ghost extends Character {
   }
 }
 
-class Candy extends Character {
-  constructor(x, y, size) {
-    super(x, y, size);
-    this.element.style.display = "flex";
-    this.element.style.alignItems = "center";
-    this.element.style.justifyContent = "center";
-    this.element.style.fontSize = `${charSize}px`;
+class Treat extends Character {
+  constructor(x, y, type) {
+    super(x, y);
     this.element.style.zIndex = zIndex.item;
-    this.element.textContent = "🍬";
+    if (type === "candy") {
+      this.element.textContent = "🍬";
+    } else if (type === "lollipop") {
+      this.element.textContent = "🍭";
+    }
   }
 
   update() {
-    this.element.style.left = `${this.x - this.size / 2}px`;
-    this.element.style.top = `${this.y - this.size / 2}px`;
+    this.element.style.left = `${this.x - charSize / 2}px`;
+    this.element.style.top = `${this.y - charSize / 2}px`;
   }
 
   remove() {
     super.remove();
   }
 
-  catchCandy() {
-    score.candy++;
+  catchTreat(type) {
+    if (type === "candy") {
+      score.candy++;
+    } else if (type === "lollipop") {
+      score.lollipop++;
+    }
     this.remove();
-    this.available = false;
-    handleHeroFace("happy");
-  }
-}
-
-class Lollipop extends Candy {
-  constructor(x, y, size) {
-    super(x, y, size);
-    this.element.textContent = "🍭";
-  }
-
-  remove() {
-    super.remove();
-  }
-
-  update() {
-    super.update();
-  }
-
-  catchLollipop() {
-    score.lollipop++;
-    this.remove();
-    this.available = false;
     handleHeroFace("happy");
   }
 }
 
 class Pumpkin extends Character {
-  constructor(x, y, size) {
-    super(x, y, size);
-    this.element.style.display = "flex";
-    this.element.style.alignItems = "center";
-    this.element.style.justifyContent = "center";
-    this.element.style.fontSize = `${charSize}px`;
+  constructor(x, y) {
+    super(x, y);
     this.element.textContent = "🎃";
     this.element.style.zIndex = zIndex.item;
   }
 
   update() {
-    this.element.style.left = `${this.x - this.size / 2}px`;
-    this.element.style.top = `${this.y - this.size / 2}px`;
+    this.element.style.left = `${this.x - charSize / 2}px`;
+    this.element.style.top = `${this.y - charSize / 2}px`;
   }
 
   remove() {
@@ -267,9 +232,6 @@ const addEventListeners = () => {
     }
     console.log("pointermove");
     e.preventDefault();
-    if (gameover) {
-      return;
-    }
     // X座標が-1でない場合、つまりクリックした場合
     if (clickedX && clickedY) {
       if (gameover) {
@@ -293,6 +255,14 @@ const addEventListeners = () => {
       );
       heroUpdate();
     }
+  });
+
+  board.addEventListener("touchmove", function (e) {
+    if (gameover) {
+      return;
+    }
+    console.log("touchmove");
+    e.preventDefault();
   });
 
   board.addEventListener("pointerup", (e) => {
@@ -326,9 +296,9 @@ const updateItems = (itemType) => {
         const diffY = item.y - heroY;
         if (diffX ** 2 + diffY ** 2 < diff ** 2) {
           itemType === "candy"
-            ? item.catchCandy()
+            ? item.catchTreat("candy")
             : itemType === "lollipop"
-            ? item.catchLollipop()
+            ? item.catchTreat("lollipop")
             : null;
         }
       }
@@ -337,38 +307,31 @@ const updateItems = (itemType) => {
   }
 };
 
-const showItems = async (itemType) => {
+const showTreats = async (itemType) => {
   let interval = 0;
+  let randomX = Math.random() * boardWidth;
+  let randomY = Math.random() * boardHeight;
+  const itemX =
+    randomX > boardWidth / 2 ? randomX - charSize / 2 : randomX + charSize / 2;
+  const itemY =
+    randomY > boardHeight / 2 ? randomY - charSize / 2 : randomY + charSize / 2;
+
   while (!gameover) {
     await new Promise((r) => setTimeout(r, 16));
-    let randomX = Math.random() * boardWidth;
-    let randomY = Math.random() * boardHeight;
-
-    const itemX =
-      randomX > boardWidth / 2
-        ? randomX - charSize / 2
-        : randomX + charSize / 2;
-    const itemY =
-      randomY > boardHeight / 2
-        ? randomY - charSize / 2
-        : randomY + charSize / 2;
-    // const diff = ((charSize + charSize) / 2) * 0.6;
-
     if (interval === 0) {
       interval = itemType == "candy" ? candyInterval : lollipopInterval;
       if (itemType === "candy") {
-        candyList.push(new Candy(itemX, itemY, charSize));
+        candyList.push(new Treat(itemX, itemY, "candy"));
       } else if (itemType === "lollipop") {
-        lollipopList.push(new Lollipop(itemX, itemY, charSize));
+        lollipopList.push(new Treat(itemX, itemY, "lollipop"));
       }
     }
     interval--;
-
     updateItems(itemType);
   }
 };
 
-const showPumpkin = () => {
+const showPumpkin = async () => {
   let randomX = Math.random() * boardWidth;
   let randomY = Math.random() * boardHeight;
   let randomTime = Math.random() * 10000 + 10000; // 10000 から 20000 の間の数
@@ -377,12 +340,17 @@ const showPumpkin = () => {
     randomX > boardWidth / 2 ? randomX - charSize / 2 : randomX + charSize / 2;
   const itemY =
     randomY > boardHeight / 2 ? randomY - charSize / 2 : randomY + charSize / 2;
+
   setTimeout(() => {
-    pumpkin = new Pumpkin(itemX, itemY, charSize);
+    if (gameover) return;
+    pumpkin = new Pumpkin(itemX, itemY);
     pumpkin.update();
   }, randomTime);
 
-  updateItems("pumpkin");
+  while (!gameover) {
+    await new Promise((r) => setTimeout(r, 16));
+    updateItems("pumpkin");
+  }
 };
 
 const showGhosts = async () => {
@@ -401,14 +369,8 @@ const showGhosts = async () => {
     }
     interval--;
 
-    for (let ghost of ghostList) {
-      ghost.update();
-    }
-
     ghostList = ghostList.filter((ghost) => ghost.isInBoard());
-
-    // ？？？
-    for (const ghost of ghostList) {
+    for (let ghost of ghostList) {
       if (!ghost.available) {
         continue;
       }
@@ -419,6 +381,7 @@ const showGhosts = async () => {
         handleGameOver();
         return;
       }
+      ghost.update();
     }
   }
 };
@@ -435,7 +398,7 @@ const handleGameOver = () => {
   setTimeout(() => {
     const result = document.getElementById("result");
     result.style.display = "block";
-    triggerCongetti();
+    triggerConfetti();
   }, 300);
 };
 
@@ -443,7 +406,7 @@ const handlePlayAgain = () => {
   location.reload();
 };
 
-const triggerCongetti = () => {
+const triggerConfetti = () => {
   const jsConfetti = new JSConfetti();
   jsConfetti.addConfetti();
   jsConfetti.addConfetti({
@@ -474,9 +437,8 @@ const gameInit = () => {
   createHero();
   heroUpdate();
   addEventListeners();
-  showItems("candy");
-  showItems("lollipop");
-  showItems("pumpkin");
+  showTreats("candy");
+  showTreats("lollipop");
   showGhosts();
   showPumpkin();
   board.style.cursor = "grab";
