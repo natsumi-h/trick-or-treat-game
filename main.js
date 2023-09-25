@@ -7,7 +7,7 @@ let score = {
 let ghostList = [];
 let candyList = [];
 let lollipopList = [];
-const charSize = 40;
+const charSize = 45;
 const candyInterval = 100;
 const lollipopInterval = 200;
 const zIndex = {
@@ -51,7 +51,7 @@ class Character {
     this.element.style.display = "flex";
     this.element.style.alignItems = "center";
     this.element.style.justifyContent = "center";
-    this.element.style.fontSize = `${charSize}px`;
+    this.element.style.fontSize = `${charSize - 5}px`;
   }
 
   update() {
@@ -184,7 +184,7 @@ const createHero = () => {
   heroElement.style.justifyContent = "center";
   heroElement.style.width = `${charSize}px`;
   heroElement.style.height = `${charSize}px`;
-  heroElement.style.fontSize = `${charSize}px`;
+  heroElement.style.fontSize = `${charSize - 5}px`;
   heroElement.style.zIndex = zIndex.hero;
   heroElement.textContent = "🧒🏻";
   board.appendChild(heroElement);
