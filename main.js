@@ -16,7 +16,19 @@ const zIndex = {
   item: 1,
 };
 
-// const ghostSpeed = width / 200;
+const elements = {
+  board: document.getElementById("board"),
+  playAgainBtn: document.getElementById("playAgain"),
+  elapsedTimeEl: document.getElementById("elapsedTime"),
+  candyScoreEl: document.getElementById("candy"),
+  lollipopScoreEl: document.getElementById("lollipop"),
+  result: document.getElementById("result"),
+  levelDiv: document.getElementById("level"),
+  levelForm: document.getElementById("levelForm"),
+  countDown: document.getElementById("countDown"),
+  countDowmNum: document.getElementById("countDownNum"),
+};
+
 const ghostSpeed = () => {
   if (level === "easy") {
     return 1.2;
@@ -44,7 +56,7 @@ class Character {
     this.speed = speed;
     this.available = true;
     const element = document.createElement("div");
-    board.appendChild(element);
+    elements.board.appendChild(element);
     element.style.position = "absolute";
     element.style.width = `${charSize}px`;
     element.style.height = `${charSize}px`;
@@ -56,8 +68,11 @@ class Character {
   }
 
   update() {
-    this.x += Math.cos(this.angle) * this.speed;
-    this.y += Math.sin(this.angle) * this.speed;
+    // Math.cos(0) === 1, Math.cos(90) === 0
+    // Math.sin(0) === 0, Math.sin(90) === 1
+    // speedに対して、どのくらいの割合でxとyを動かすかを決める
+    this.x += this.speed * Math.cos(this.angle);
+    this.y += this.speed * Math.sin(this.angle);
     this.element.style.left = `${this.x - charSize / 2}px`;
     this.element.style.top = `${this.y - charSize / 2}px`;
   }
@@ -163,18 +178,10 @@ class Pumpkin extends Character {
   }
 }
 
-const getCache = () => {
-  board = document.getElementById("board");
-  boardWidth = board.clientWidth;
-  boardHeight = board.clientHeight;
-  boardMarginLeft = board.getBoundingClientRect().left;
-  // heroの初期位置;
-  heroX = boardWidth / 2;
-  heroY = boardHeight / 2;
-  playAgainBtn = document.getElementById("playAgain");
-  elapsedTimeEl = document.getElementById("elapsedTime");
-  candyScoreEl = document.getElementById("candy");
-  lollipopScoreEl = document.getElementById("lollipop");
+const getBoardSize = () => {
+  boardHeight = elements.board.clientHeight;
+  boardWidth = elements.board.clientWidth;
+  boardMarginLeft = elements.board.getBoundingClientRect().left;
 };
 
 const createHero = () => {
@@ -188,10 +195,13 @@ const createHero = () => {
   heroElement.style.fontSize = `${charSize - 5}px`;
   heroElement.style.zIndex = zIndex.hero;
   heroElement.textContent = "🧒🏻";
-  board.appendChild(heroElement);
+  elements.board.appendChild(heroElement);
+  // heroの初期位置;
+  heroX = boardWidth / 2;
+  heroY = boardHeight / 2;
 };
 
-const heroUpdate = () => {
+const updateHero = () => {
   // Heroを動かす
   heroElement.style.left = `${heroX - charSize / 2}px`;
   heroElement.style.top = `${heroY - charSize / 2}px`;
@@ -212,7 +222,7 @@ const handleHeroFace = (faceType) => {
 };
 
 const addEventListeners = () => {
-  board.addEventListener("pointerdown", (e) => {
+  elements.board.addEventListener("pointerdown", (e) => {
     if (gameover) {
       return;
     }
@@ -224,10 +234,10 @@ const addEventListeners = () => {
     // originHeroXYには、heroの位置が入る
     originHeroX = heroX;
     originHeroY = heroY;
-    board.style.cursor = "grabbing";
+    elements.board.style.cursor = "grabbing";
   });
 
-  board.addEventListener("pointermove", function (e) {
+  elements.board.addEventListener("pointermove", function (e) {
     if (gameover) {
       return;
     }
@@ -254,11 +264,11 @@ const addEventListeners = () => {
         boardHeight - charSize / 2,
         Math.max(charSize / 2, heroY)
       );
-      heroUpdate();
+      updateHero();
     }
   });
 
-  board.addEventListener("touchmove", function (e) {
+  elements.board.addEventListener("touchmove", function (e) {
     if (gameover) {
       return;
     }
@@ -266,16 +276,17 @@ const addEventListeners = () => {
     e.preventDefault();
   });
 
-  board.addEventListener("pointerup", (e) => {
+  elements.board.addEventListener("pointerup", (e) => {
     if (gameover) {
       return;
     }
     console.log("pointerup");
-    board.style.cursor = "grab";
+    elements.board.style.cursor = "grab";
     e.preventDefault();
     clickedX = null;
   });
-  playAgainBtn.addEventListener("click", handlePlayAgain);
+
+  elements.playAgainBtn.addEventListener("click", handlePlayAgain);
 };
 
 const updateItems = (itemType) => {
@@ -363,8 +374,10 @@ const showGhosts = async () => {
       interval = ghostInterval();
       const ghostX = Math.random() * boardWidth;
       const ghostY = Math.random() > 0.5 ? 0 : boardHeight;
+      // ghostを原点とし、heroの位置を終点とした直線と、x軸とのなす角度を求め、それに0.5-(0〜1のランダムな数)を足すことで、ghostの進行方向をランダムにする
       const angle =
         Math.atan2(heroY - ghostY, heroX - ghostX) + (0.5 - Math.random());
+      // 1.2/1.6/2.5に1〜2のランダムな値を足す（easy:2.2〜3.2, normal:2.6〜3.6, hard:3.5〜4.5）これが16msごとのleftとtopの移動距離になる
       const speed = ghostSpeed() * (1 + Math.random());
       ghostList.push(new Ghost(ghostX, ghostY, angle, speed));
     }
@@ -390,15 +403,14 @@ const showGhosts = async () => {
 const handleGameOver = () => {
   gameover = true;
   handleHeroFace("gameover");
-  board.style.cursor = "default";
+  elements.board.style.cursor = "default";
   const endTime = performance.now();
   elapsedTime = Math.round(((endTime - startTime) / 1000) * 100) / 100;
-  elapsedTimeEl.textContent = elapsedTime;
-  candyScoreEl.textContent = score.candy;
-  lollipopScoreEl.textContent = score.lollipop;
+  elements.elapsedTimeEl.textContent = elapsedTime;
+  elements.candyScoreEl.textContent = score.candy;
+  elements.lollipopScoreEl.textContent = score.lollipop;
   setTimeout(() => {
-    const result = document.getElementById("result");
-    result.style.display = "block";
+    elements.result.style.display = "block";
     triggerConfetti();
   }, 300);
 };
@@ -420,37 +432,38 @@ const handleLevelSubmit = (e) => {
   const levelValue = e.target.levelSelect.value;
   level = levelValue;
 
-  levelDiv.style.display = "none";
-  countDown.style.display = "flex";
+  elements.levelDiv.style.display = "none";
+  elements.countDown.style.display = "flex";
   for (let i = 3; i >= 0; i--) {
     setTimeout(() => {
-      countDowmNum.textContent = i;
+      elements.countDowmNum.textContent = i;
       if (i === 0) {
-        countDown.style.display = "none";
-        gameInit();
+        elements.countDown.style.display = "none";
+        startGame();
       }
     }, (3 - i) * 1000);
   }
 };
 
-const gameInit = () => {
-  getCache();
-  createHero();
-  heroUpdate();
+const startGame = () => {
+  getBoardSize();
   addEventListeners();
+  createHero();
+  updateHero();
   showTreats("candy");
   showTreats("lollipop");
   showGhosts();
   showPumpkin();
-  board.style.cursor = "grab";
+  elements.board.style.cursor = "grab";
   startTime = performance.now();
 };
 
-window.addEventListener("load", async () => {
-  // init();
-  levelDiv = document.getElementById("level");
-  levelForm = document.getElementById("levelForm");
-  levelForm.addEventListener("submit", handleLevelSubmit);
-  countDown = document.getElementById("countDown");
-  countDowmNum = document.getElementById("countDownNum");
-});
+const addLevelSubmitListener = () => {
+  elements.levelForm.addEventListener("submit", handleLevelSubmit);
+};
+
+const initialize = () => {
+  addLevelSubmitListener();
+};
+
+initialize();
