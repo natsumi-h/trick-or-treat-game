@@ -20,7 +20,7 @@
       <div id="board">
         <!-- Level -->
         <div id="level">
-          <p>Choose your level</p>
+          <p>Choose Your Level</p>
           <form id="levelForm">
             <div class="selectWrapper">
               <select id="levelSelect">
@@ -33,14 +33,18 @@
             <input id="start" type="submit" value="Start" />
           </form>
         </div>
+        <div id="currentScore">Score: <span id="currentScoreNum"></span></div>
         <!-- Countdown -->
         <div id="countDown"><span id="countDownNum">1</span></div>
         <!-- Result -->
         <div id="result">
-          <p>You've got</p>
-          <p><span id="candy"></span> 🍬s</p>
-          <p><span id="lollipop"></span> 🍭s</p>
-          <p>Wandered for <span id="elapsedTime"></span> secs!</p>
+          <p class="resultHead">Great Job!🎉</p>
+          <div class="scoreContainer">
+            <p>🍬 <span id="candy"></span> candies</p>
+            <p>🍭 <span id="lollipop"></span> lollipops</p>
+            <p>⏱ <span id="elapsedTime"></span> seconds</p>
+            <p>🏆 <span id="finalScore"></span> total points</p>
+          </div>
           <p class="happy-halloween">👻 Happy Halloween! 👻</p>
           <button id="playAgain">Let's Play Again</button>
         </div>

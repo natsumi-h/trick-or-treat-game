@@ -56,6 +56,16 @@ h1 {
   }
 }
 
+#currentScore {
+  color: #fff;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  padding: 10px;
+  min-width: 100px;
+  display: none;
+}
+
 #result {
   position: absolute;
   width: 90%;
@@ -63,7 +73,7 @@ h1 {
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
-  color: black;
+  color: #000;
   text-align: center;
   background: #fdf8e6;
   padding: 20px;
@@ -76,6 +86,24 @@ h1 {
   #result {
     width: 70%;
   }
+}
+
+#result .scoreContainer {
+  text-align: left;
+  width: 250px;
+  margin: 10px auto 0 auto;
+}
+
+#result .scoreContainer .resultHead {
+  font-weight: bold;
+}
+
+#result .scoreContainer span {
+  display: inline-block;
+  text-align: center;
+  color: #451952;
+  min-width: 80px;
+  vertical-align: middle;
 }
 
 #result .happy-halloween {
@@ -91,7 +119,7 @@ h1 {
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
-  color: black;
+  color: #000;
   text-align: center;
   background: #fdf8e6;
   padding: 20px;
@@ -142,15 +170,15 @@ h1 {
 }
 
 #level select:focus {
-  outline-color: orange;
+  outline-color: #f2b705;
 }
 
 #playAgain,
 #start {
   text-transform: uppercase;
   border: none;
-  background: orange;
-  color: white;
+  background: #f2b705;
+  color: #fff;
   padding: 10px 20px;
   font-size: 1rem;
   cursor: pointer;
@@ -174,7 +202,7 @@ h1 {
   left: 50%;
   -webkit-transform: translate(-50%, -50%);
           transform: translate(-50%, -50%);
-  color: white;
+  color: #fff;
   text-align: center;
   padding: 20px;
   z-index: 999;

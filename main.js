@@ -1,15 +1,17 @@
 let clickedX, clickedY, originHeroX, originHeroY, level, pumpkin;
 let gameover = false;
-let score = {
+let treatNum = {
   candy: 0,
   lollipop: 0,
 };
 let ghostList = [];
 let candyList = [];
 let lollipopList = [];
+let currentScoreNum = 0;
 const charSize = 45;
 const candyInterval = 100;
 const lollipopInterval = 200;
+
 const zIndex = {
   hero: 100,
   ghost: 10,
@@ -27,6 +29,9 @@ const elements = {
   levelForm: document.getElementById("levelForm"),
   countDown: document.getElementById("countDown"),
   countDowmNum: document.getElementById("countDownNum"),
+  currentScoreNum: document.getElementById("currentScoreNum"),
+  currentScore: document.getElementById("currentScore"),
+  finalScore: document.getElementById("finalScore"),
 };
 
 const ghostSpeed = () => {
@@ -38,6 +43,7 @@ const ghostSpeed = () => {
     return 2.5;
   } else return;
 };
+
 const ghostInterval = () => {
   if (level === "easy") {
     return 60;
@@ -142,9 +148,13 @@ class Treat extends Character {
 
   catchTreat(type) {
     if (type === "candy") {
-      score.candy++;
+      treatNum.candy++;
+      currentScoreNum += 10;
+      showScore();
     } else if (type === "lollipop") {
-      score.lollipop++;
+      treatNum.lollipop++;
+      currentScoreNum += 50;
+      showScore();
     }
     this.remove();
     handleHeroFace("happy");
@@ -226,7 +236,7 @@ const addEventListeners = () => {
     if (gameover) {
       return;
     }
-    console.log("pointerdown");
+    // console.log("pointerdown");
     e.preventDefault();
     // originalXYには、クリックした座標が入る
     clickedX = e.pageX;
@@ -241,7 +251,7 @@ const addEventListeners = () => {
     if (gameover) {
       return;
     }
-    console.log("pointermove");
+    // console.log("pointermove");
     e.preventDefault();
     // X座標が-1でない場合、つまりクリックした場合
     if (clickedX && clickedY) {
@@ -272,7 +282,7 @@ const addEventListeners = () => {
     if (gameover) {
       return;
     }
-    console.log("touchmove");
+    // console.log("touchmove");
     e.preventDefault();
   });
 
@@ -280,7 +290,7 @@ const addEventListeners = () => {
     if (gameover) {
       return;
     }
-    console.log("pointerup");
+    // console.log("pointerup");
     elements.board.style.cursor = "grab";
     e.preventDefault();
     clickedX = null;
@@ -307,11 +317,11 @@ const updateItems = (itemType) => {
         const diffX = item.x - heroX;
         const diffY = item.y - heroY;
         if (diffX ** 2 + diffY ** 2 < diff ** 2) {
-          itemType === "candy"
-            ? item.catchTreat("candy")
-            : itemType === "lollipop"
-            ? item.catchTreat("lollipop")
-            : null;
+          if (itemType === "candy") {
+            item.catchTreat("candy");
+          } else if (itemType === "lollipop") {
+            item.catchTreat("lollipop");
+          }
         }
       }
       item.update();
@@ -319,17 +329,26 @@ const updateItems = (itemType) => {
   }
 };
 
+const showScore = () => {
+  elements.currentScore.style.display = "block";
+  elements.currentScoreNum.textContent = currentScoreNum;
+};
+
 const showTreats = async (itemType) => {
   let interval = 0;
-  let randomX = Math.random() * boardWidth;
-  let randomY = Math.random() * boardHeight;
-  const itemX =
-    randomX > boardWidth / 2 ? randomX - charSize / 2 : randomX + charSize / 2;
-  const itemY =
-    randomY > boardHeight / 2 ? randomY - charSize / 2 : randomY + charSize / 2;
 
   while (!gameover) {
     await new Promise((r) => setTimeout(r, 16));
+    let randomX = Math.random() * boardWidth;
+    let randomY = Math.random() * boardHeight;
+    const itemX =
+      randomX > boardWidth / 2
+        ? randomX - charSize / 2
+        : randomX + charSize / 2;
+    const itemY =
+      randomY > boardHeight / 2
+        ? randomY - charSize / 2
+        : randomY + charSize / 2;
     if (interval === 0) {
       interval = itemType == "candy" ? candyInterval : lollipopInterval;
       if (itemType === "candy") {
@@ -347,7 +366,6 @@ const showPumpkin = async () => {
   let randomX = Math.random() * boardWidth;
   let randomY = Math.random() * boardHeight;
   let randomTime = Math.random() * 10000 + 10000; // 10000 から 20000 の間の数
-  // const randomTime = 1000;
   const itemX =
     randomX > boardWidth / 2 ? randomX - charSize / 2 : randomX + charSize / 2;
   const itemY =
@@ -407,8 +425,9 @@ const handleGameOver = () => {
   const endTime = performance.now();
   elapsedTime = Math.round(((endTime - startTime) / 1000) * 100) / 100;
   elements.elapsedTimeEl.textContent = elapsedTime;
-  elements.candyScoreEl.textContent = score.candy;
-  elements.lollipopScoreEl.textContent = score.lollipop;
+  elements.candyScoreEl.textContent = treatNum.candy;
+  elements.lollipopScoreEl.textContent = treatNum.lollipop;
+  elements.finalScore.textContent = currentScoreNum;
   setTimeout(() => {
     elements.result.style.display = "block";
     triggerConfetti();
@@ -446,6 +465,7 @@ const handleLevelSubmit = (e) => {
 };
 
 const startGame = () => {
+  showScore();
   getBoardSize();
   addEventListeners();
   createHero();
