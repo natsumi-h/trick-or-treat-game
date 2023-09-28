@@ -11,6 +11,11 @@ This is a game where a user controls a character that can catch candies, lollipo
 ### Score view
 <img width="1385" alt="Screenshot 2023-09-25 at 8 36 43 PM" src="https://github.com/natsumi-h/trick-or-treat-game/assets/88537845/965c7a66-1867-42fd-bc13-6d85787985bf">
 
+### Mobile view
+![Screenshot 2023-09-28 at 7 14 42 PM](https://github.com/natsumi-h/trick-or-treat-game/assets/88537845/a6e45691-7360-4455-9934-38bdb153f174)
+![Screenshot 2023-09-28 at 7 14 54 PM](https://github.com/natsumi-h/trick-or-treat-game/assets/88537845/3cb1f4e2-964c-4170-b552-5a6c12791547)
+
+
 ## Technologies Used
 - HTML
 - CSS(Sass)
