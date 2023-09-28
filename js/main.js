@@ -1,4 +1,19 @@
-let clickedX, clickedY, originHeroX, originHeroY, level, pumpkin;
+import { Ghost, Treat, Pumpkin } from "./class.js";
+
+let clickedX,
+  clickedY,
+  heroXWhenPointerDown,
+  heroYWhenPointerDown,
+  level,
+  pumpkin,
+  boardHeight,
+  boardWidth,
+  boardMarginLeft,
+  heroElement,
+  heroX,
+  heroY,
+  startTime,
+  elapsedTime;
 let gameover = false;
 let treatNum = {
   candy: 0,
@@ -11,7 +26,6 @@ let currentScoreNum = 0;
 const charSize = 45;
 const candyInterval = 100;
 const lollipopInterval = 200;
-
 const zIndex = {
   hero: 100,
   ghost: 10,
@@ -53,140 +67,6 @@ const ghostInterval = () => {
     return 10;
   } else return;
 };
-
-class Character {
-  constructor(x, y, angle, speed) {
-    this.x = x;
-    this.y = y;
-    this.angle = angle;
-    this.speed = speed;
-    this.available = true;
-    const element = document.createElement("div");
-    elements.board.appendChild(element);
-    element.style.position = "absolute";
-    element.style.width = `${charSize}px`;
-    element.style.height = `${charSize}px`;
-    this.element = element;
-    this.element.style.display = "flex";
-    this.element.style.alignItems = "center";
-    this.element.style.justifyContent = "center";
-    this.element.style.fontSize = `${charSize - 5}px`;
-  }
-
-  update() {
-    // Math.cos(0) === 1, Math.cos(90) === 0
-    // Math.sin(0) === 0, Math.sin(90) === 1
-    // speedに対して、どのくらいの割合でxとyを動かすかを決める
-    this.x += this.speed * Math.cos(this.angle);
-    this.y += this.speed * Math.sin(this.angle);
-    this.element.style.left = `${this.x - charSize / 2}px`;
-    this.element.style.top = `${this.y - charSize / 2}px`;
-  }
-
-  remove() {
-    this.available = false;
-    this.element.remove();
-  }
-}
-
-class Ghost extends Character {
-  constructor(x, y, angle, speed) {
-    super(x, y, angle, speed);
-    this.element.style.zIndex = zIndex.ghost;
-    this.element.style.transition =
-      "opacity 300ms ease-in-out, filter 300ms ease-in-out";
-    this.element.textContent = "👻";
-  }
-
-  update() {
-    super.update();
-    if (!this.isInBoard()) {
-      this.remove();
-    }
-  }
-
-  async remove() {
-    this.element.style.opacity = 0;
-    this.element.style.filter = "brightness(100)";
-    await new Promise((r) => setTimeout(r, 300));
-    super.remove();
-  }
-
-  isInBoard() {
-    if (
-      !this.available ||
-      this.x < 0 - charSize / 2 ||
-      this.x > boardWidth + charSize / 2 ||
-      this.y < 0 - charSize / 2 ||
-      this.y > boardHeight + charSize / 2
-    ) {
-      return false;
-    }
-    return true;
-  }
-}
-
-class Treat extends Character {
-  constructor(x, y, type) {
-    super(x, y);
-    this.element.style.zIndex = zIndex.item;
-    if (type === "candy") {
-      this.element.textContent = "🍬";
-    } else if (type === "lollipop") {
-      this.element.textContent = "🍭";
-    }
-  }
-
-  update() {
-    this.element.style.left = `${this.x - charSize / 2}px`;
-    this.element.style.top = `${this.y - charSize / 2}px`;
-  }
-
-  remove() {
-    super.remove();
-  }
-
-  catchTreat(type) {
-    if (type === "candy") {
-      treatNum.candy++;
-      currentScoreNum += 10;
-      showScore();
-    } else if (type === "lollipop") {
-      treatNum.lollipop++;
-      currentScoreNum += 50;
-      showScore();
-    }
-    this.remove();
-    handleHeroFace("happy");
-  }
-}
-
-class Pumpkin extends Character {
-  constructor(x, y) {
-    super(x, y);
-    this.element.textContent = "🎃";
-    this.element.style.zIndex = zIndex.item;
-  }
-
-  update() {
-    this.element.style.left = `${this.x - charSize / 2}px`;
-    this.element.style.top = `${this.y - charSize / 2}px`;
-  }
-
-  remove() {
-    super.remove();
-  }
-
-  clearGhosts() {
-    handleHeroFace("clearGhost");
-    for (const ghost of ghostList) {
-      ghost.remove();
-    }
-    ghostList = [];
-    this.remove();
-    showPumpkin();
-  }
-}
 
 const getBoardSize = () => {
   boardHeight = elements.board.clientHeight;
@@ -233,38 +113,34 @@ const handleHeroFace = (faceType) => {
 
 const addEventListeners = () => {
   elements.board.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
     if (gameover) {
       return;
     }
     // console.log("pointerdown");
-    e.preventDefault();
     // originalXYには、クリックした座標が入る
     clickedX = e.pageX;
     clickedY = e.pageY;
     // originHeroXYには、heroの位置が入る
-    originHeroX = heroX;
-    originHeroY = heroY;
+    heroXWhenPointerDown = heroX;
+    heroYWhenPointerDown = heroY;
     elements.board.style.cursor = "grabbing";
   });
 
   elements.board.addEventListener("pointermove", function (e) {
+    e.preventDefault();
     if (gameover) {
       return;
     }
-    // console.log("pointermove");
-    e.preventDefault();
     // X座標が-1でない場合、つまりクリックした場合
     if (clickedX && clickedY) {
-      if (gameover) {
-        return;
-      }
       // クリックした座標と、クリックしたまま動かした座標の差分を取得
       const diffX = e.pageX - clickedX;
       const diffY = e.pageY - clickedY;
 
       // heroの位置を、クリックした座標と、クリックしたまま動かした座標の差分に応じて変更
-      heroX = originHeroX + diffX * 1.5;
-      heroY = originHeroY + diffY * 1.5;
+      heroX = heroXWhenPointerDown + diffX * 1.5;
+      heroY = heroYWhenPointerDown + diffY * 1.5;
       // heroの位置が、boardの外に出ないように制御
       heroX = Math.min(
         boardWidth - charSize / 2,
@@ -279,20 +155,18 @@ const addEventListeners = () => {
   });
 
   elements.board.addEventListener("touchmove", function (e) {
+    e.preventDefault();
     if (gameover) {
       return;
     }
-    // console.log("touchmove");
-    e.preventDefault();
   });
 
   elements.board.addEventListener("pointerup", (e) => {
+    e.preventDefault();
     if (gameover) {
       return;
     }
-    // console.log("pointerup");
     elements.board.style.cursor = "grab";
-    e.preventDefault();
     clickedX = null;
   });
 
@@ -308,6 +182,12 @@ const updateItems = (itemType) => {
       const diffY = pumpkin.y - heroY;
       if (diffX ** 2 + diffY ** 2 < diff ** 2) {
         pumpkin.clearGhosts();
+        handleHeroFace("clearGhost");
+        ghostList = [];
+        // for (const ghost of ghostList) {
+        //   ghost.remove();
+        // }
+        showPumpkin();
       }
     }
   } else {
@@ -318,10 +198,16 @@ const updateItems = (itemType) => {
         const diffY = item.y - heroY;
         if (diffX ** 2 + diffY ** 2 < diff ** 2) {
           if (itemType === "candy") {
-            item.catchTreat("candy");
+            treatNum.candy++;
+            currentScoreNum += 10;
+            item.remove();
           } else if (itemType === "lollipop") {
-            item.catchTreat("lollipop");
+            treatNum.lollipop++;
+            currentScoreNum += 50;
+            item.remove();
           }
+          showScore();
+          handleHeroFace("happy");
         }
       }
       item.update();
@@ -365,7 +251,8 @@ const showTreats = async (itemType) => {
 const showPumpkin = async () => {
   let randomX = Math.random() * boardWidth;
   let randomY = Math.random() * boardHeight;
-  let randomTime = Math.random() * 10000 + 10000; // 10000 から 20000 の間の数
+  // let randomTime = Math.random() * 10000 + 10000; // 10000 から 20000 の間の数
+  let randomTime = Math.random() * 10000 + 5000;
   const itemX =
     randomX > boardWidth / 2 ? randomX - charSize / 2 : randomX + charSize / 2;
   const itemY =
@@ -487,3 +374,13 @@ const initialize = () => {
 };
 
 initialize();
+
+export {
+  elements,
+  boardWidth,
+  boardHeight,
+  charSize,
+  zIndex,
+  showPumpkin,
+  ghostList,
+};

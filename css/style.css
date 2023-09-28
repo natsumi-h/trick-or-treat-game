@@ -1,8 +1,7 @@
 * {
   margin: 0;
   padding: 0;
-  -webkit-box-sizing: border-box;
-          box-sizing: border-box;
+  box-sizing: border-box;
   font-family: "Roboto", sans-serif;
   overflow: hidden;
 }
@@ -11,17 +10,10 @@ main {
   font-size: 16px;
   width: 100vw;
   height: calc(100vh - 50px);
-  display: -webkit-box;
-  display: -ms-flexbox;
   display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: center;
+  align-items: center;
 }
-
 @media screen and (min-width: 768px) {
   main {
     height: calc(100vh - 63px);
@@ -34,7 +26,6 @@ h1 {
   padding: 10px;
   font-size: 22px;
 }
-
 @media screen and (min-width: 768px) {
   h1 {
     font-size: 32px;
@@ -47,7 +38,6 @@ h1 {
   height: 100%;
   background-color: #451952;
 }
-
 @media screen and (min-width: 768px) {
   #board {
     max-width: 900px;
@@ -71,8 +61,7 @@ h1 {
   width: 90%;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   color: #000;
   text-align: center;
   background: #fdf8e6;
@@ -81,23 +70,19 @@ h1 {
   z-index: 999;
   font-size: 1.5rem;
 }
-
 @media screen and (min-width: 768px) {
   #result {
     width: 70%;
   }
 }
-
 #result .scoreContainer {
   text-align: left;
   width: 250px;
   margin: 10px auto 0 auto;
 }
-
 #result .scoreContainer .resultHead {
   font-weight: bold;
 }
-
 #result .scoreContainer span {
   display: inline-block;
   text-align: center;
@@ -105,20 +90,17 @@ h1 {
   min-width: 80px;
   vertical-align: middle;
 }
-
 #result .happy-halloween {
   margin-top: 10px;
 }
 
 #level {
-  -webkit-filter: none;
-          filter: none;
+  filter: none;
   position: absolute;
   width: 90%;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   color: #000;
   text-align: center;
   background: #fdf8e6;
@@ -126,20 +108,17 @@ h1 {
   z-index: 999;
   font-size: 1.5rem;
 }
-
 @media screen and (min-width: 768px) {
   #level {
     width: 70%;
   }
 }
-
 #level .selectWrapper {
   position: relative;
   width: 50%;
   margin: 0 auto;
   margin-top: 20px;
 }
-
 #level .selectWrapper::after {
   content: "";
   position: absolute;
@@ -150,11 +129,9 @@ h1 {
   height: 8px;
   border-bottom: 2px solid #ccc;
   border-right: 2px solid #ccc;
-  -webkit-transform: rotate(45deg) translateY(-50%);
-          transform: rotate(45deg) translateY(-50%);
+  transform: rotate(45deg) translateY(-50%);
   pointer-events: none;
 }
-
 #level select {
   width: 100%;
   margin: 0 auto;
@@ -168,7 +145,6 @@ h1 {
      -moz-appearance: none;
           appearance: none;
 }
-
 #level select:focus {
   outline-color: #f2b705;
 }
@@ -191,17 +167,12 @@ h1 {
 #countDown {
   position: absolute;
   display: none;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
+  justify-content: center;
+  align-items: center;
   border-radius: 50%;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
   color: #fff;
   text-align: center;
   padding: 20px;
@@ -209,10 +180,8 @@ h1 {
   font-size: 100px;
   font-weight: bold;
 }
-
 @media screen and (min-width: 768px) {
   #countDown {
     font-size: 200px;
   }
-}
-/*# sourceMappingURL=style.css.map */
+}/*# sourceMappingURL=style.css.map */
