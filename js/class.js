@@ -1,11 +1,4 @@
-import {
-  elements,
-  boardWidth,
-  boardHeight,
-  charSize,
-  zIndex,
-  ghostList,
-} from "./main.js";
+import { elements, boardWidth, boardHeight, charSize, zIndex } from "./main.js";
 
 class Character {
   constructor(x, y) {
@@ -54,15 +47,17 @@ class Ghost extends Character {
     this.x += this.speed * Math.cos(this.angle);
     this.y += this.speed * Math.sin(this.angle);
     if (!this.isInBoard()) {
+      this.available = false;
       this.remove();
     }
   }
 
-  async remove() {
+  remove() {
     this.element.style.opacity = 0;
     this.element.style.filter = "brightness(100)";
-    await new Promise((r) => setTimeout(r, 300));
-    super.remove();
+    setTimeout(() => {
+      super.remove();
+    }, 300);
   }
 
   isInBoard() {
@@ -98,20 +93,6 @@ class Treat extends Character {
   remove() {
     super.remove();
   }
-
-  // catchTreat(type) {
-  //   if (type === "candy") {
-  //     //   treatNum.candy++;
-  //     //   currentScoreNum += 10;
-  //     //   showScore();
-  //   } else if (type === "lollipop") {
-  //     //   treatNum.lollipop++;
-  //     //   currentScoreNum += 50;
-  //     //   showScore();
-  //   }
-  //   this.remove();
-  //   // handleHeroFace("happy");
-  // }
 }
 
 class Pumpkin extends Character {
@@ -128,17 +109,6 @@ class Pumpkin extends Character {
 
   remove() {
     super.remove();
-  }
-
-  clearGhosts() {
-    console.log("clearGhosts");
-    // handleHeroFace("clearGhost");
-    for (const ghost of ghostList) {
-      ghost.remove();
-    }
-    // ghostList = [];
-    this.remove();
-    // showPumpkin();
   }
 }
 

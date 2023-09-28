@@ -23,6 +23,7 @@ let ghostList = [];
 let candyList = [];
 let lollipopList = [];
 let currentScoreNum = 0;
+
 const charSize = 45;
 const candyInterval = 100;
 const lollipopInterval = 200;
@@ -31,7 +32,7 @@ const zIndex = {
   ghost: 10,
   item: 1,
 };
-
+const diff = ((charSize + charSize) / 2) * 0.6;
 const elements = {
   board: document.getElementById("board"),
   playAgainBtn: document.getElementById("playAgain"),
@@ -117,7 +118,6 @@ const addEventListeners = () => {
     if (gameover) {
       return;
     }
-    // console.log("pointerdown");
     // originalXYには、クリックした座標が入る
     clickedX = e.pageX;
     clickedY = e.pageY;
@@ -142,14 +142,19 @@ const addEventListeners = () => {
       heroX = heroXWhenPointerDown + diffX * 1.5;
       heroY = heroYWhenPointerDown + diffY * 1.5;
       // heroの位置が、boardの外に出ないように制御
-      heroX = Math.min(
-        boardWidth - charSize / 2,
-        Math.max(charSize / 2, heroX)
-      );
-      heroY = Math.min(
-        boardHeight - charSize / 2,
-        Math.max(charSize / 2, heroY)
-      );
+      if (heroX < charSize / 2) {
+        heroX = charSize / 2;
+      }
+      if (heroX > boardWidth - charSize / 2) {
+        heroX = boardWidth - charSize / 2;
+      }
+      if (heroY < charSize / 2) {
+        heroY = charSize / 2;
+      }
+      if (heroY > boardHeight - charSize / 2) {
+        heroY = boardHeight - charSize / 2;
+      }
+
       updateHero();
     }
   });
@@ -168,51 +173,10 @@ const addEventListeners = () => {
     }
     elements.board.style.cursor = "grab";
     clickedX = null;
+    clickedY = null;
   });
 
   elements.playAgainBtn.addEventListener("click", handlePlayAgain);
-};
-
-const updateItems = (itemType) => {
-  const diff = ((charSize + charSize) / 2) * 0.6;
-
-  if (itemType === "pumpkin" && pumpkin) {
-    if (pumpkin.available) {
-      const diffX = pumpkin.x - heroX;
-      const diffY = pumpkin.y - heroY;
-      if (diffX ** 2 + diffY ** 2 < diff ** 2) {
-        pumpkin.clearGhosts();
-        handleHeroFace("clearGhost");
-        ghostList = [];
-        // for (const ghost of ghostList) {
-        //   ghost.remove();
-        // }
-        showPumpkin();
-      }
-    }
-  } else {
-    for (let item of itemType === "candy" ? candyList : lollipopList) {
-      // Collision Detection
-      if (item.available) {
-        const diffX = item.x - heroX;
-        const diffY = item.y - heroY;
-        if (diffX ** 2 + diffY ** 2 < diff ** 2) {
-          if (itemType === "candy") {
-            treatNum.candy++;
-            currentScoreNum += 10;
-            item.remove();
-          } else if (itemType === "lollipop") {
-            treatNum.lollipop++;
-            currentScoreNum += 50;
-            item.remove();
-          }
-          showScore();
-          handleHeroFace("happy");
-        }
-      }
-      item.update();
-    }
-  }
 };
 
 const showScore = () => {
@@ -220,9 +184,16 @@ const showScore = () => {
   elements.currentScoreNum.textContent = currentScoreNum;
 };
 
+const isCollisionDetected = (item) => {
+  const diffX = item.x - heroX;
+  const diffY = item.y - heroY;
+  if (diffX ** 2 + diffY ** 2 < diff ** 2) {
+    return true;
+  }
+};
+
 const showTreats = async (itemType) => {
   let interval = 0;
-
   while (!gameover) {
     await new Promise((r) => setTimeout(r, 16));
     let randomX = Math.random() * boardWidth;
@@ -239,12 +210,36 @@ const showTreats = async (itemType) => {
       interval = itemType == "candy" ? candyInterval : lollipopInterval;
       if (itemType === "candy") {
         candyList.push(new Treat(itemX, itemY, "candy"));
+        candyList[candyList.length - 1].update();
       } else if (itemType === "lollipop") {
         lollipopList.push(new Treat(itemX, itemY, "lollipop"));
+        lollipopList[lollipopList.length - 1].update();
       }
     }
     interval--;
-    updateItems(itemType);
+    
+    // Collision detection
+    catchTreats(itemType);
+  }
+};
+
+const catchTreats = (itemType) => {
+  for (let item of itemType === "candy" ? candyList : lollipopList) {
+    if (isCollisionDetected(item)) {
+      if (itemType === "candy") {
+        treatNum.candy++;
+        currentScoreNum += 10;
+        item.remove();
+        candyList = candyList.filter((candy) => candy.available);
+      } else if (itemType === "lollipop") {
+        treatNum.lollipop++;
+        currentScoreNum += 50;
+        item.remove();
+        lollipopList = lollipopList.filter((lollipop) => lollipop.available);
+      }
+      showScore();
+      handleHeroFace("happy");
+    }
   }
 };
 
@@ -266,8 +261,23 @@ const showPumpkin = async () => {
 
   while (!gameover) {
     await new Promise((r) => setTimeout(r, 16));
-    updateItems("pumpkin");
+    if (!pumpkin) continue;
+    // Collision detection
+    if (isCollisionDetected(pumpkin)) {
+      clearGhosts();
+    }
   }
+};
+
+const clearGhosts = () => {
+  for (const ghost of ghostList) {
+    ghost.remove();
+  }
+  pumpkin.remove();
+  handleHeroFace("clearGhost");
+  ghostList = [];
+  pumpkin = null;
+  showPumpkin();
 };
 
 const showGhosts = async () => {
@@ -275,6 +285,7 @@ const showGhosts = async () => {
   while (!gameover) {
     await new Promise((r) => setTimeout(r, 16));
 
+    // generate ghost
     if (interval == 0) {
       interval = ghostInterval();
       const ghostX = Math.random() * boardWidth;
@@ -288,15 +299,13 @@ const showGhosts = async () => {
     }
     interval--;
 
-    ghostList = ghostList.filter((ghost) => ghost.isInBoard());
+    ghostList = ghostList.filter((ghost) => ghost.available);
+
+    // collision detection
     for (let ghost of ghostList) {
       if (!ghost.available) {
         continue;
-      }
-      const dx = ghost.x - heroX;
-      const dy = ghost.y - heroY;
-      const diff = ((charSize + charSize) / 2) * 0.6;
-      if (dx ** 2 + dy ** 2 < diff ** 2) {
+      } else if (isCollisionDetected(ghost)) {
         handleGameOver();
         return;
       }
