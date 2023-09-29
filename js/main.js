@@ -32,7 +32,9 @@ const zIndex = {
   ghost: 10,
   item: 1,
 };
-const diff = ((charSize + charSize) / 2) * 0.6;
+
+const collisionAllowance = ((charSize + charSize) / 2) * 0.6;
+
 const elements = {
   board: document.getElementById("board"),
   playAgainBtn: document.getElementById("playAgain"),
@@ -187,7 +189,7 @@ const showScore = () => {
 const isCollisionDetected = (item) => {
   const diffX = item.x - heroX;
   const diffY = item.y - heroY;
-  if (diffX ** 2 + diffY ** 2 < diff ** 2) {
+  if (diffX ** 2 + diffY ** 2 < collisionAllowance ** 2) {
     return true;
   }
 };
@@ -217,7 +219,7 @@ const showTreats = async (itemType) => {
       }
     }
     interval--;
-    
+
     // Collision detection
     catchTreats(itemType);
   }
