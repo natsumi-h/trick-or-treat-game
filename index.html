@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Trick or Treat</title>
+    <link href="https://fonts.cdnfonts.com/css/roboto" rel="stylesheet" />
+    <link rel="stylesheet" href="./css/style.css" />
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon-16x16.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <script src="https://cdn.jsdelivr.net/npm/js-confetti@latest/dist/js-confetti.browser.js"></script>
+    <script type="module" defer src="./js/main.js"></script>
+  </head>
+  <body>
+    <header><h1>🎃 trick or treat game 🎃</h1></header>
+    <main>
+      <div id="board">
+        <!-- Level -->
+        <div id="level">
+          <p>Choose Your Level</p>
+          <form id="levelForm">
+            <div class="selectWrapper">
+              <select id="levelSelect">
+                <option value="easy">Easy</option>
+                <option value="normal">Normal</option>
+                <option value="hard">Hard</option>
+              </select>
+            </div>
+
+            <input id="start" type="submit" value="Start" />
+          </form>
+        </div>
+        <div id="currentScore">Score: <span id="currentScoreNum"></span></div>
+        <!-- Countdown -->
+        <div id="countDown"><span id="countDownNum">1</span></div>
+        <!-- Result -->
+        <div id="result">
+          <p class="resultHead">Great Job!🎉</p>
+          <div class="scoreContainer">
+            <p>🍬 <span id="candy"></span> candies</p>
+            <p>🍭 <span id="lollipop"></span> lollipops</p>
+            <p>⏱ <span id="elapsedTime"></span> seconds</p>
+            <p>🏆 <span id="finalScore"></span> total points</p>
+          </div>
+          <p class="happy-halloween">👻 Happy Halloween! 👻</p>
+          <button id="playAgain">Let's Play Again</button>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
