@@ -37,20 +37,141 @@ Lists to hold instances of ghosts, candies, and lollipops.
 * `ghostSpeed` and `ghostInterval` are defined as functions that return values based on the game's difficulty `level`.
 
 ### Character Classes
-* Character is the base class used to create other game characters, such as ghosts, treats (candy and lollipop), and pumpkins.
+* `Character` is the base class used to create other game characters, such as ghosts, treats (candy and lollipop), and pumpkins.
 * `Ghost`, `Treat`, and `Pumpkin` classes extend Character, each implementing its own specific behaviors and interactions within the game.
 
-### Event Listeners
+### Key Event Listeners
 * Event listeners are added to the game board to handle pointer (mouse or touch) interactions, like moving the Hero and grabbing the treats.
 
-### Game Logic
+```
+elements.board.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    if (gameover) {
+      return;
+    }
+    clickedX = e.pageX;
+    clickedY = e.pageY;
+    heroXWhenPointerDown = heroX;
+    heroYWhenPointerDown = heroY;
+    elements.board.style.cursor = "grabbing";
+  });
+```
+
+```
+  elements.board.addEventListener("pointermove", function (e) {
+    e.preventDefault();
+    if (gameover) {
+      return;
+    }
+    if (clickedX && clickedY) {
+      const diffX = e.pageX - clickedX;
+      const diffY = e.pageY - clickedY;
+      heroX = heroXWhenPointerDown + diffX * 1.5;
+      heroY = heroYWhenPointerDown + diffY * 1.5;
+      if (heroX < charSize / 2) {
+        heroX = charSize / 2;
+      }
+      if (heroX > boardWidth - charSize / 2) {
+        heroX = boardWidth - charSize / 2;
+      }
+      if (heroY < charSize / 2) {
+        heroY = charSize / 2;
+      }
+      if (heroY > boardHeight - charSize / 2) {
+        heroY = boardHeight - charSize / 2;
+      }
+
+      updateHero();
+    }
+  });
+```
+
+### Game Logic and Key Functions
 * There are several functions implementing game logic, including `showTreats`, `showPumpkin`, and `showGhosts`, which handle the creation and updating of game items and characters.
 * `updateItems` updates the positions of items, and checks for collision with the hero.
 * `handleGameOver` sets the game status to over and updates the user interface accordingly.
 
+```
+const showGhosts = async () => {
+  let interval = 0;
+  while (!gameover) {
+    await new Promise((r) => setTimeout(r, 16));
+
+    // generate ghost
+    if (interval == 0) {
+      interval = ghostInterval();
+      const ghostX = Math.random() * boardWidth;
+      const ghostY = Math.random() > 0.5 ? 0 : boardHeight;
+
+      const angle =
+        Math.atan2(heroY - ghostY, heroX - ghostX) + (0.5 - Math.random());
+
+      const speed = ghostSpeed() * (1 + Math.random());
+      ghostList.push(new Ghost(ghostX, ghostY, angle, speed));
+    }
+    interval--;
+
+    ghostList = ghostList.filter((ghost) => ghost.available);
+
+    // collision detection
+    for (let ghost of ghostList) {
+      if (!ghost.available) {
+        continue;
+      } else if (isCollisionDetected(ghost)) {
+        handleGameOver();
+        return;
+      }
+      ghost.update();
+    }
+  }
+};
+```
+```
+const showTreats = async (itemType) => {
+  let interval = 0;
+  while (!gameover) {
+    await new Promise((r) => setTimeout(r, 16));
+    let randomX = Math.random() * boardWidth;
+    let randomY = Math.random() * boardHeight;
+    const itemX =
+      randomX > boardWidth / 2
+        ? randomX - charSize / 2
+        : randomX + charSize / 2;
+    const itemY =
+      randomY > boardHeight / 2
+        ? randomY - charSize / 2
+        : randomY + charSize / 2;
+    if (interval === 0) {
+      interval = itemType == "candy" ? candyInterval : lollipopInterval;
+      if (itemType === "candy") {
+        candyList.push(new Treat(itemX, itemY, "candy"));
+        candyList[candyList.length - 1].update();
+      } else if (itemType === "lollipop") {
+        lollipopList.push(new Treat(itemX, itemY, "lollipop"));
+        lollipopList[lollipopList.length - 1].update();
+      }
+    }
+    interval--;
+
+    // Collision detection
+    catchTreats(itemType);
+  }
+};
+```
+
 ### Collision Detection
-* The code checks for collisions between the Hero and other game characters using the distance formula in a 2D plane, which is basically a simplified version of the Pythagorean theorem.
+* The code checks for collisions between the Hero and other game characters using the distance formula in a 2D plane.
 * If a collision with a ghost is detected, the game is over.
+
+```
+const isCollisionDetected = (item) => {
+  const diffX = item.x - heroX;
+  const diffY = item.y - heroY;
+  if (diffX ** 2 + diffY ** 2 < collisionAllowance ** 2) {
+    return true;
+  }
+};
+```
 
 ## Biggest Challenge
 
