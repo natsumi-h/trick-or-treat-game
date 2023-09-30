@@ -230,9 +230,13 @@ const showGhosts = async () => {
 ```
 
 ## Key learnings/takeaways
-* class
-* get codes organized
-    * collision detection
-    * show treats/showPumpkin/handleHeroFace/handleGameover/clearGhosts 
+### The Use Case of Classes
+* Classes are used to create objects of a certain type.
+* Using the extends Keyword to Create a Subclass.
+* The super keyword is used to access properties of the superclass(The original class).
+  
+### Get Codes Organized
+* Tried to reuse functions with parameters instead of repeatedly code the same (ex. `isCollisionDetected`, `showTreats`, `showPumpkin`, `handleHeroFace`)
+* Put long code into a function, so it will be recognized what for (ex. `handleGameover`, `clearGhosts`)
 
 ## Next Steps
