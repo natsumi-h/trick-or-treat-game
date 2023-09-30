@@ -240,3 +240,5 @@ const showGhosts = async () => {
 * Put long code into a function, so it will be recognized what for (ex. `handleGameover`, `clearGhosts`)
 
 ## Next Steps
+* Avoid to locate items overwrapped
+
