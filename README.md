@@ -174,7 +174,65 @@ const isCollisionDetected = (item) => {
 ```
 
 ## Biggest Challenge
+### Memory Consuming issue
+* `GhostList` array coutinuously getting pushed causes huge memory consumpsion and slow motion.
+  
+### How did it get resoleved?
+* Applied `available` property for `Ghost` class and made it `false` once `isInBoard` returns false
+* Filtered the ghost object whose `available` property is `false` out of `GhostList`
+
+```
+class Character {
+  constructor(x, y) {
+    // ...
+    this.available = true;
+    // ...
+  }
+
+  // ...
+}
+
+class Ghost extends Character {
+  // ...
+
+  update() {
+    // ...
+    if (!this.isInBoard()) {
+      this.available = false;
+      this.remove();
+    }
+  }
+
+  // ...
+
+  isInBoard() {
+    if (
+      !this.available ||
+      this.x < 0 - charSize / 2 ||
+      this.x > boardWidth + charSize / 2 ||
+      this.y < 0 - charSize / 2 ||
+      this.y > boardHeight + charSize / 2
+    ) {
+      return false;
+    }
+    return true;
+  }
+}
+```
+```
+const showGhosts = async () => {
+// ...
+
+    ghostList = ghostList.filter((ghost) => ghost.available);
+
+// ...
+};
+```
 
 ## Key learnings/takeaways
+* class
+* get codes organized
+    * collision detection
+    * show treats/showPumpkin/handleHeroFace/handleGameover/clearGhosts 
 
 ## Next Steps
