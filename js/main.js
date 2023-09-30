@@ -194,12 +194,34 @@ const isCollisionDetected = (item) => {
   }
 };
 
+const generateRandomTreatPosition = () => {
+  let valid = false;
+  let randomX, randomY;
+
+  while (!valid) {
+    valid = true;
+    randomX = Math.random() * boardWidth;
+    randomY = Math.random() * boardHeight;
+
+    [...candyList, ...lollipopList].forEach((item) => {
+      if (Math.abs(item.x - randomX) < 50 && Math.abs(item.y - randomY) < 50) {
+        valid = false; // 既存のアイテムの近くに新しいアイテムがある場合、位置は無効になります。
+      }
+    });
+  }
+
+  return { randomX, randomY };
+};
+
 const showTreats = async (itemType) => {
   let interval = 0;
   while (!gameover) {
     await new Promise((r) => setTimeout(r, 16));
-    let randomX = Math.random() * boardWidth;
-    let randomY = Math.random() * boardHeight;
+    // let randomX = Math.random() * boardWidth;
+    // let randomY = Math.random() * boardHeight;
+
+    const { randomX, randomY } = generateRandomTreatPosition();
+    
     const itemX =
       randomX > boardWidth / 2
         ? randomX - charSize / 2
