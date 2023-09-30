@@ -242,3 +242,4 @@ const showGhosts = async () => {
 ## Next Steps
 * Avoid to locate items overwrapped
 
+Happy Halloween! \ 👻🎃🧒🏻 /
