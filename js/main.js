@@ -95,7 +95,6 @@ const createHero = () => {
 };
 
 const updateHero = () => {
-  // Heroを動かす
   heroElement.style.left = `${heroX - charSize / 2}px`;
   heroElement.style.top = `${heroY - charSize / 2}px`;
 };
@@ -205,7 +204,7 @@ const generateRandomTreatPosition = () => {
 
     [...candyList, ...lollipopList].forEach((item) => {
       if (Math.abs(item.x - randomX) < 50 && Math.abs(item.y - randomY) < 50) {
-        valid = false; // 既存のアイテムの近くに新しいアイテムがある場合、位置は無効になります。
+        valid = false;
       }
     });
   }
@@ -217,8 +216,6 @@ const showTreats = async (itemType) => {
   let interval = 0;
   while (!gameover) {
     await new Promise((r) => setTimeout(r, 16));
-    // let randomX = Math.random() * boardWidth;
-    // let randomY = Math.random() * boardHeight;
 
     const { randomX, randomY } = generateRandomTreatPosition();
     
