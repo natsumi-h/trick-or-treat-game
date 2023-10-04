@@ -218,7 +218,7 @@ const showTreats = async (itemType) => {
     await new Promise((r) => setTimeout(r, 16));
 
     const { randomX, randomY } = generateRandomTreatPosition();
-    
+
     const itemX =
       randomX > boardWidth / 2
         ? randomX - charSize / 2
@@ -229,10 +229,10 @@ const showTreats = async (itemType) => {
         : randomY + charSize / 2;
     if (interval === 0) {
       interval = itemType == "candy" ? candyInterval : lollipopInterval;
-      if (itemType === "candy") {
+      if (itemType === "candy" && candyList.length <= 4) {
         candyList.push(new Treat(itemX, itemY, "candy"));
         candyList[candyList.length - 1].update();
-      } else if (itemType === "lollipop") {
+      } else if (itemType === "lollipop" && lollipopList.length <= 4) {
         lollipopList.push(new Treat(itemX, itemY, "lollipop"));
         lollipopList[lollipopList.length - 1].update();
       }
