@@ -367,7 +367,6 @@ const handlePlayAgain = () => {
 
 const triggerConfetti = () => {
   const jsConfetti = new JSConfetti();
-  jsConfetti.addConfetti();
   jsConfetti.addConfetti({
     emojis: ["🌈", "⚡️", "💥", "✨", "💫", "🎃", "👻", "🍭", "🍬"],
   });
