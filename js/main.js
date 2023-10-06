@@ -339,7 +339,7 @@ const handleMessage = () => {
   } else if (currentScoreNum >= 500) {
     return "Excellent!🎉";
   } else {
-    return "Great Job!🎉";
+    return "Good Job!";
   }
 };
 
