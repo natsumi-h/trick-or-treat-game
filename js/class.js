@@ -43,7 +43,6 @@ class Ghost extends Character {
     super.update();
     // Math.cos(0) === 1, Math.cos(90) === 0
     // Math.sin(0) === 0, Math.sin(90) === 1
-    // speedに対して、どのくらいの割合でxとyを動かすかを決める
     this.x += this.speed * Math.cos(this.angle);
     this.y += this.speed * Math.sin(this.angle);
     if (!this.isInBoard()) {

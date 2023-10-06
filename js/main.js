@@ -49,6 +49,8 @@ const elements = {
   currentScoreNum: document.getElementById("currentScoreNum"),
   currentScore: document.getElementById("currentScore"),
   finalScore: document.getElementById("finalScore"),
+
+  message: document.getElementById("resultHead"),
 };
 
 const ghostSpeed = () => {
@@ -119,10 +121,8 @@ const addEventListeners = () => {
     if (gameover) {
       return;
     }
-    // originalXYには、クリックした座標が入る
     clickedX = e.pageX;
     clickedY = e.pageY;
-    // originHeroXYには、heroの位置が入る
     heroXWhenPointerDown = heroX;
     heroYWhenPointerDown = heroY;
     elements.board.style.cursor = "grabbing";
@@ -133,16 +133,14 @@ const addEventListeners = () => {
     if (gameover) {
       return;
     }
-    // X座標が-1でない場合、つまりクリックした場合
     if (clickedX && clickedY) {
-      // クリックした座標と、クリックしたまま動かした座標の差分を取得
       const diffX = e.pageX - clickedX;
       const diffY = e.pageY - clickedY;
 
-      // heroの位置を、クリックした座標と、クリックしたまま動かした座標の差分に応じて変更
       heroX = heroXWhenPointerDown + diffX * 1.5;
       heroY = heroYWhenPointerDown + diffY * 1.5;
-      // heroの位置が、boardの外に出ないように制御
+
+      // make heroXY boardXY as min/max
       if (heroX < charSize / 2) {
         heroX = charSize / 2;
       }
@@ -311,10 +309,10 @@ const showGhosts = async () => {
       interval = ghostInterval();
       const ghostX = Math.random() * boardWidth;
       const ghostY = Math.random() > 0.5 ? 0 : boardHeight;
-      // ghostを原点とし、heroの位置を終点とした直線と、x軸とのなす角度を求め、それに0.5-(0〜1のランダムな数)を足すことで、ghostの進行方向をランダムにする
+
       const angle =
         Math.atan2(heroY - ghostY, heroX - ghostX) + (0.5 - Math.random());
-      // 1.2/1.6/2.5に1〜2のランダムな値を足す（easy:2.2〜3.2, normal:2.6〜3.6, hard:3.5〜4.5）これが16msごとのleftとtopの移動距離になる
+
       const speed = ghostSpeed() * (1 + Math.random());
       ghostList.push(new Ghost(ghostX, ghostY, angle, speed));
     }
@@ -335,6 +333,16 @@ const showGhosts = async () => {
   }
 };
 
+const handleMessage = () => {
+  if (currentScoreNum >= 1000) {
+    return "You are a Halloween Master!🎉";
+  } else if (currentScoreNum >= 500) {
+    return "Excellent!🎉";
+  } else {
+    return "Great Job!🎉";
+  }
+};
+
 const handleGameOver = () => {
   gameover = true;
   handleHeroFace("gameover");
@@ -345,6 +353,8 @@ const handleGameOver = () => {
   elements.candyScoreEl.textContent = treatNum.candy;
   elements.lollipopScoreEl.textContent = treatNum.lollipop;
   elements.finalScore.textContent = currentScoreNum;
+  elements.message.textContent = handleMessage();
+
   setTimeout(() => {
     elements.result.style.display = "block";
     triggerConfetti();
